@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+import datetime
 import requests
 import scrapy
 import json
@@ -93,6 +94,8 @@ def attrStrCmp(s):
     if s.find(u'净利润(元)') != -1:
         return '净利润'  
     if s.find(u'净利润同比增长率(%)') != -1:
+        return '净利润同比增长率'
+    if s.find(u'归属母公司股东的净利润(同比增长率)(%)') != -1:
         return '净利润同比增长率'
     if s.find(u'买入信号') != -1:
         return '买入信号'
@@ -195,24 +198,25 @@ def attrStrCmp(s):
 class StockanalySpider(scrapy.Spider):
     name = 'stockAnaly'
     headers={
-        'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept':'image/webp,image/apng,image/*,*/*;q=0.8',
         'Accept-Encoding':'gzip, deflate',
         'Accept-Language':'zh-CN,zh;q=0.9',
-        'Cache-Control':'max-age=0',
+        #'Cache-Control':'max-age=0',
         'Connection':'keep-alive',
         #'Cookie':'cid=nskbfvr9pc29m4mjtsdeit4jf31510283024; ComputerID=nskbfvr9pc29m4mjtsdeit4jf31510283024; guideState=1; other_uid=Ths_iwencai_Xuangu_b9b3a6b974ef2a54915c94512d5b3719; PHPSESSID=4cf5e5ab98be906203372c16ab5a17de; v=AlTVo_lY8xjlpGdUEaCtTgtMJZnDrXjcutEM2-404F9i2fqNFr1IJwrh3G09',
         'Host':'www.iwencai.com',
-        'Upgrade-Insecure-Requests':'1',
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
+        #'Upgrade-Insecure-Requests':'1',
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
         'X-Requested-With':'XMLHttpRequest',
-        'hexin-v':'AlDRr93MP-FZmePlmJHxmjfwIZWnGTjMVtaIf0opH-l6qP6B8ikE86YNWMSZ'
+        'hexin-v':'AgeGyk75FjoVzpK2-tJS1FPFlrDSDNtJNeNfYtn0Ixa9SCmm4dxrPkWw77jq'
     }
     #formatStr = "主力净量，主力金额，换手率小于10，量比，大单买入比大于大单卖出比，主动买入比大于主动卖出比，大单净额，中单净额，小单净额，\
     #净利润，净利润增长率，买入信号，股性评分，机构动向，外盘，内盘，总金额，总手，\
     #开盘，昨收，最高，最低，振幅，流通市值，五日线，十日线，二十日线，昨日收盘价低于五日均线，现价高于五日均线".encode('utf-8')
     
     #formatStr = "自由流通市值".encode('utf-8')
-    formatStr = "主力净量，现价，涨跌幅，涨跌，主力金额，换手率，量比，成交量，流通市值，自由流通市值，自由流通股，实际换手率，股性评分，机构动向，大单买入比，大单卖出比，主动买入比，主动卖出比，被动买入比，被动卖出比，大单净额，中单净额，小单净额，净利润，净利润增长率，成交额，总金额，总市值，总手，开盘价，昨日收盘价，最高价，最低价，振幅，上市天数，所属同花顺行业，技术形态，选股动向，买入信号，五日线，十日线，二十日线，消息面评分，技术面评分，资金面评分，行业面评分，基本面评分，牛叉诊股综合评分".encode('utf-8')
+    #formatStr = "主力净量，现价，涨跌幅，涨跌，主力金额，换手率，量比，成交量，流通市值，自由流通市值，自由流通股，实际换手率，股性评分，机构动向，大单买入比，大单卖出比，主动买入比，主动卖出比，被动买入比，被动卖出比，大单净额，中单净额，小单净额，成交额，总金额，总市值，总手，开盘价，昨日收盘价，最高价，最低价，振幅，五日线，十日线，二十日线，大单净流入量，流通a股，散户数量，主力买入金额，主力卖出金额，大单买入金额，大单卖出金额，中单买入金额，中单卖出金额，小单买入金额，小单卖出金额，净利润，净利润增长率，所属同花顺行业，上市天数，买入信号，技术形态，选股动向，消息面评分，技术面评分，资金面评分，行业面评分，基本面评分，牛叉诊股综合评分，营业收入，营业收入同比增长率，销售毛利率，摊薄净资产收益率，每股净资产，上市日期".encode('utf-8')
+    formatStr = "主力净量，现价，涨跌幅，涨跌，主力金额，换手率，量比，成交量，流通市值，自由流通市值，自由流通股，实际换手率，股性评分，机构动向，大单买入比，大单卖出比，主动买入比，主动卖出比，被动买入比，被动卖出比，大单净额，中单净额，小单净额，成交额，总金额，总市值，总手，开盘价，昨日收盘价，最高价，最低价，振幅，五日线，十日线，二十日线，大单净流入量，流通a股，散户数量，主力买入金额，主力卖出金额，大单买入金额，大单卖出金额，中单买入金额，中单卖出金额，小单买入金额，小单卖出金额，净利润，净利润增长率".encode('utf-8')
     '''
     formatStr = "主力净量，主力金额，换手率小于10，量比，大单买入比，大单卖出比，主动买入比，主动卖出比，大单净额，中单净额，小单净额".encode('utf-8')
     '''
@@ -222,21 +226,21 @@ class StockanalySpider(scrapy.Spider):
         'qs':'stockpick_h',
         'querytype':'stock',
         'p':'1',
-        'perpage':'3600',
+        'perpage':'3700',
         'changeperpage':'1'
     }
     cookies = {
         'cid':'nskbfvr9pc29m4mjtsdeit4jf31510283024',
         'ComputerID':'nskbfvr9pc29m4mjtsdeit4jf31510283024',
-        'guideState':'1',
+        #'guideState':'1',
         'other_uid':'Ths_iwencai_Xuangu_b9b3a6b974ef2a54915c94512d5b3719',
-        'user':'MDptb18yNTI0MjY2MjM6Ok5vbmU6NTAwOjI2MjQyNjYyMzo1LDEsNDA7NiwxLDQwOzcsMTExMTExMTExMTEwLDQwOzgsMTExMTAxMTEwMDAwMTExMTEwMDEwMDEwMDEwLDQwOzMzLDAwMDEwMDAwMDAwMCw3NjszNiwxMDAxMTExMTAwMDAxMTAwMTAxMTExMTEsNzY7NDYsMDAwMDExMDAxMDAwMDAxMTExMTExMTExLDc2OzUxLDExMDAwMDAwMDAwMDAwMDAsNzY7NTgsMDAwMDAwMDAwMDAwMDAwMDEsNzY7NzgsMSw3Njs4NywwMDAwMDAwMDAwMDAwMDAwMDAwMTAwMDAsNzY7NDQsMTEsNDA7MSwxLDQwOzIsMSw0MDszLDEsNDA6MjQ6OjoyNTI0MjY2MjM6MTUyOTcyMTY5NTo6OjE0MzI0NjA4MjA6MzE0MzA1OjA6MTNjNzkxYzNjNGMxYTA3OWVkZDQyMzM4OGNmY2RkYTBkOmRlZmF1bHRfMjox',
+        'user':'MDptb18yNTI0MjY2MjM6Ok5vbmU6NTAwOjI2MjQyNjYyMzo1LDEsNDA7NiwxLDQwOzcsMTExMTExMTExMTEwLDQwOzgsMTExMTAxMTEwMDAwMTExMTEwMDEwMDEwMDEwLDQwOzMzLDAwMDEwMDAwMDAwMCwyODE7MzYsMTAwMTExMTEwMDAwMTEwMDEwMTExMTExLDI4MTs0NiwwMDAwMTEwMDEwMDAwMDExMTExMTExMTEsMjgxOzUxLDExMDAwMDAwMDAwMDAwMDAsMjgxOzU4LDAwMDAwMDAwMDAwMDAwMDAxLDI4MTs3OCwxLDI4MTs4NywwMDAwMDAwMDAwMDAwMDAwMDAwMTAwMDAsMjgxOzQ0LDExLDQwOzEsMSw0MDsyLDEsNDA7MywxLDQwOjI0Ojo6MjUyNDI2NjIzOjE1NDM1NDkxOTQ6OjoxNDMyNDYwODIwOjQwMDgwNjowOjFlOTNmZDFjNzkwZjY0ODlhNmI4YmY5MTY2M2IyODZkYjpkZWZhdWx0XzI6MQ%3D%3D',
         'userid':'252426623',
         'u_name':'mo_252426623',
         'escapename':'mo_252426623',
-        'ticket':'f0462308347a448ccd5205ed809e2f98',
-        'PHPSESSID':'a02de041d23883b7de208bc94a5d82e3',
-        'v':'AlDRr93MP-FZmePlmJHxmjfwIZWnGTjMVtaIf0opH-l6qP6B8ikE86YNWMSZ'
+        'ticket':'7197fceb268431d3bad66ce1704b645b',
+        'PHPSESSID':'bbc2ece0356a87571a88028db40d6ba1',
+        'v':'AooLwdMu4ss8WG5nSKqpA4Io23svew6BAPyCeRTDNl1oxyQt_Ate5dCP0oDn'
     }
     
     start_urls = ['http://www.iwencai.com/stockpick/search']
@@ -355,8 +359,11 @@ class StockanalySpider(scrapy.Spider):
                 start = end
 
                 item['minLen'] = min(item['minLen'], len(item[string]))
-                
-            self.f = open("D:/share/自由流通市值.txt", "w")
+            
+            now = datetime.datetime.now()
+            fileStr = now.strftime('%Y%m%d')
+            fileName = 'D:/share/自由流通市值_' + fileStr + '.txt'
+            self.f = open(fileName, "w")
             for i in range(len(item['code'])):
                 self.f.write(item['code'][i] + ' ' + item['name'][i] + ' ' + item['自由流通股'][i] + ' ' + item['股性评分'][i] + '\n')
             self.f.write('\n')
