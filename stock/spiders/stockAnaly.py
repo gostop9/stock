@@ -194,6 +194,19 @@ def attrStrCmp(s):
     else:
         return '其它'
     
+def hexin():
+    hexin_list = [Avp7scPecHvcKPwWNHCX73baSysfq34E8CzyKQTzpg1Y95Sd7DvOlcC_QjTX,
+    Apwdi3HALr2G89ph0fYZZeQMbbFNFUCfwrpUA3adqAdqwTLnniUQzxLJJJrF,
+    AqcmKu6ZtawxajEgnrry9LMlNtByLHpC1Qf_gnkUwzZdaMmGgfwLXuXQj96K,
+    #Anj5NzUUUs-9xb5LNUI1MegASS0J4dzOPkaw77LpxLNmzRYbWvGs-45VgHIB
+    AuNidvLNud7ybHXqXB9uYFc5ciyO2HR5sWu7ThVAP8K5VA3anagHasE8S48m,
+    AoYHzbeSJIRUhfDgOovji0pe13cL58rYnCj-BXCvcqmEcygh2HcasWy7Th9D,
+    An38qGgP_4rAC1tmQm5olo2bjNJ0GrELu00VQD_CuVQDdpMEB2rBPEueJRrM,
+    AosKfuqVUUo2qI0erDwW6O_xGiR2IJ8fGTdjVv2IZ0ohHKXShfAv8ikE860O,
+    AsZHDfdS5MxzV7AoYXGjywqeF7dLJwpR3Gg-RbDvsunEs2hhGLda8az7jlyD,
+    AqcmKu6ZtZbwizEaUAry9LMlNtByLHsO1QD_gnkUwzZdaMmGgfwLXuXQj9aK,
+    
+    ]
         
 class StockanalySpider(scrapy.Spider):
     name = 'stockAnaly'
@@ -208,7 +221,7 @@ class StockanalySpider(scrapy.Spider):
         #'Upgrade-Insecure-Requests':'1',
         'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
         'X-Requested-With':'XMLHttpRequest',
-        'hexin-v':'AgeGyk75FjoVzpK2-tJS1FPFlrDSDNtJNeNfYtn0Ixa9SCmm4dxrPkWw77jq'
+        'hexin-v':'AlzdSzEAblIXdxoOzpZZJSTMLXEN1QB4gnoUwzZdaMcqgfKnXuXQj9KJ5FmF'
     }
     #formatStr = "主力净量，主力金额，换手率小于10，量比，大单买入比大于大单卖出比，主动买入比大于主动卖出比，大单净额，中单净额，小单净额，\
     #净利润，净利润增长率，买入信号，股性评分，机构动向，外盘，内盘，总金额，总手，\
@@ -226,7 +239,7 @@ class StockanalySpider(scrapy.Spider):
         'qs':'stockpick_h',
         'querytype':'stock',
         'p':'1',
-        'perpage':'3700',
+        'perpage':'3900',
         'changeperpage':'1'
     }
     cookies = {
@@ -246,6 +259,22 @@ class StockanalySpider(scrapy.Spider):
     start_urls = ['http://www.iwencai.com/stockpick/search']
     
     def start_requests(self):
+        
+        #read pre zhangting
+        cfg_flie = "D:/share/config.txt"
+        self.f1 = open(cfg_flie, "r")
+        cfg_lines = self.f1.readlines()
+        num = len(cfg_lines)
+        self.f1.close()
+        preDate = cfg_lines[12][0:8]
+        preFileName = 'D:/share/自由流通市值_' + preDate + '.txt'
+        self.fPre = open(preFileName, "r")
+        self.preLiuTong_lines = self.fPre.readlines()
+        self.fPre.close()
+        for j in range(len(self.preLiuTong_lines)):
+            if(self.preLiuTong_lines[j] == '\n'):
+                self.preLiuTong_lines.pop(j)
+        
         for url in self.start_urls:
             
             yield scrapy.FormRequest(
@@ -272,6 +301,7 @@ class StockanalySpider(scrapy.Spider):
         te.close()
         response = response.replace(body = file_text)
         '''
+        
         item = StockItem()
         nodeList = response.xpath('//*[@id="tableWrap"]/div[2]/div/div[1]/div/div/div[1]/ul/li')
         
@@ -360,12 +390,30 @@ class StockanalySpider(scrapy.Spider):
 
                 item['minLen'] = min(item['minLen'], len(item[string]))
             
+                       
             now = datetime.datetime.now()
             fileStr = now.strftime('%Y%m%d')
             fileName = 'D:/share/自由流通市值_' + fileStr + '.txt'
             self.f = open(fileName, "w")
+            
+            for j in range(len(self.preLiuTong_lines)):
+                findFlag = 0
+                for i in range(len(item['code'])):
+                    if(self.preLiuTong_lines[j][0:6] == item['code'][i]) :
+                        self.f.write(item['code'][i] + ' ' + item['name'][i] + ' ' + item['自由流通股'][i] + ' ' + item['股性评分'][i] + '\n')
+                        findFlag = 1
+                        break
+                if(0 == findFlag):
+                    self.f.write(self.preLiuTong_lines[j])
+                    
             for i in range(len(item['code'])):
-                self.f.write(item['code'][i] + ' ' + item['name'][i] + ' ' + item['自由流通股'][i] + ' ' + item['股性评分'][i] + '\n')
+                findFlag = 0
+                for j in range(len(self.preLiuTong_lines)):
+                    if(self.preLiuTong_lines[j][0:6] == item['code'][i]):
+                        findFlag = 1
+                        break
+                if(0 == findFlag):
+                    self.f.write(item['code'][i] + ' ' + item['name'][i] + ' ' + item['自由流通股'][i] + ' ' + item['股性评分'][i] + '\n')
             self.f.write('\n')
             self.f.close()
             '''
