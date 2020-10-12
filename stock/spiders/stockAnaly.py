@@ -211,7 +211,7 @@ def hexin():
 class StockanalySpider(scrapy.Spider):
     name = 'stockAnaly'
     headers={
-        'Accept':'image/webp,image/apng,image/*,*/*;q=0.8',
+        'Accept':'application/json, text/javascript, */*; q=0.01',
         'Accept-Encoding':'gzip, deflate',
         'Accept-Language':'zh-CN,zh;q=0.9',
         #'Cache-Control':'max-age=0',
@@ -219,9 +219,9 @@ class StockanalySpider(scrapy.Spider):
         #'Cookie':'cid=nskbfvr9pc29m4mjtsdeit4jf31510283024; ComputerID=nskbfvr9pc29m4mjtsdeit4jf31510283024; guideState=1; other_uid=Ths_iwencai_Xuangu_b9b3a6b974ef2a54915c94512d5b3719; PHPSESSID=4cf5e5ab98be906203372c16ab5a17de; v=AlTVo_lY8xjlpGdUEaCtTgtMJZnDrXjcutEM2-404F9i2fqNFr1IJwrh3G09',
         'Host':'www.iwencai.com',
         #'Upgrade-Insecure-Requests':'1',
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36',
         'X-Requested-With':'XMLHttpRequest',
-        'hexin-v':'AlzdSzEAblIXdxoOzpZZJSTMLXEN1QB4gnoUwzZdaMcqgfKnXuXQj9KJ5FmF'
+        'hexin-v':'AlTVo_lY94MTPGPP5XbR3ex0JZnFrXjjutUM2-414F9i2fqPFr1IJwrh3GM9'
     }
     #formatStr = "主力净量，主力金额，换手率小于10，量比，大单买入比大于大单卖出比，主动买入比大于主动卖出比，大单净额，中单净额，小单净额，\
     #净利润，净利润增长率，买入信号，股性评分，机构动向，外盘，内盘，总金额，总手，\
@@ -239,7 +239,7 @@ class StockanalySpider(scrapy.Spider):
         'qs':'stockpick_h',
         'querytype':'stock',
         'p':'1',
-        'perpage':'3900',
+        'perpage':'4000',
         'changeperpage':'1'
     }
     cookies = {
@@ -252,8 +252,8 @@ class StockanalySpider(scrapy.Spider):
         'u_name':'mo_252426623',
         'escapename':'mo_252426623',
         'ticket':'7197fceb268431d3bad66ce1704b645b',
-        'PHPSESSID':'bbc2ece0356a87571a88028db40d6ba1',
-        'v':'AooLwdMu4ss8WG5nSKqpA4Io23svew6BAPyCeRTDNl1oxyQt_Ate5dCP0oDn'
+        'PHPSESSID':'bbaaa8a4f448d14fda80761e8922310a',
+        'v':'AlTVo_lY94MTPGPP5XbR3ex0JZnFrXjjutUM2-414F9i2fqPFr1IJwrh3GM9'
     }
     
     start_urls = ['http://www.iwencai.com/stockpick/search']
